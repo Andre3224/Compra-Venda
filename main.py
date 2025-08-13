@@ -11,7 +11,7 @@ def index():
 
 @app.route("/cad/usuario")
 def usuario():
-    return render_template('usuario.html')
+    return render_template('usuario.html',titulo="Cadastro de Usuario")
 
 @app.route("/cad/anuncio")
 def anuncio():
