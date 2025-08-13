@@ -41,7 +41,7 @@ def usuario():
         db.session.commit()
         return redirect(url_for('index'))
     
-    return render_template('usuario.html', titulo="Cadastro de Usuario")
+    return render_template('usuario.html', usuarios = Usuario.query.all(), titulo="Cadastro de Usuario")
 
 @app.route("/cad/anuncio")
 def anuncio():

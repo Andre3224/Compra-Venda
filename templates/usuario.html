@@ -14,6 +14,10 @@
             align-items: center;
             height: 100vh;
         }
+        .wrapper {
+            display: flex;
+            gap: 60px; /* espaço maior entre formulário e tabela */
+        }
         .container {
             background: #fff;
             padding: 30px 40px;
@@ -68,26 +72,88 @@
             transform: scale(1.05);
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
+        .table-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            width: 250px;
+        }
+
+        h3 {
+            color: #ff6f00;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            background: #fff;
+            
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            word-wrap: break-word; /* quebra palavras longas */
+        }
+
+        th {
+            background-color: #ff8c00;
+            color: white;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: #fff3e0;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>{{titulo}}</h2>
-        <form action="{{ url_for('usuario') }}" method="post">
-            <label for="user">Username</label>
-            <input type="text" id="user" name="user" required>
+    <div class="wrapper">
+        <div class="container">
+            <h2>{{titulo}}</h2>
+            <form action="{{ url_for('usuario') }}" method="post">
+                <label for="user">Username</label>
+                <input type="text" id="user" name="user" required>
 
-            <label for="email">E-mail</label>
-            <input type="email" id="email" name="email" required>
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" required>
 
-            <label for="passwd">Senha</label>
-            <input type="password" id="passwd" name="passwd" required>
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" required>
 
-            <label for="end">Endereço</label>
-            <input type="text" id="end" name="end" required>
+                <label for="end">Endereço</label>
+                <input type="text" id="end" name="end" required>
 
-            <input type="submit" value="Cadastrar">
-        </form>
+                <input type="submit" value="Cadastrar">
+            </form>
+    
+            <h3>Usuários Cadastrados</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.nome }}</td>
+                        <td>{{ usuario.email }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>
