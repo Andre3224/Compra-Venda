@@ -2,8 +2,28 @@ from flask import Flask, make_response
 from markupsafe import escape
 from flask import render_template
 from flask import request
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:fusionB%C3%87@localhost:3306/banco'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+class Usuario(db.Model):
+    id = db.Column('usu_id', db.Integer, primary_key=True)
+    nome = db.Column('usu_nome', db.String(256))
+    email = db.Column('usu_email', db.String(256))
+    senha = db.Column('usu_senha', db.String(256))
+    end = db.Column('usu_end', db.String(256))
+
+    def __init__(self, nome, email, senha, end):
+        self.nome = nome
+        self.email = email
+        self.senha = senha
+        self.end = end
+
+
 
 @app.route("/")
 def index():
@@ -42,3 +62,10 @@ def relVendas():
 @app.route("/relatorios/compras")
 def relCompras():
     return render_template('relVCompras.html')
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # Agora o SQLAlchemy sabe qual app usar
+        print('Tabelas criadas no banco.')
+    app.run(debug=True)
+    
