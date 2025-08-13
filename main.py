@@ -3,6 +3,7 @@ from markupsafe import escape
 from flask import render_template
 from flask import request
 from flask_sqlalchemy import SQLAlchemy
+from flask import redirect, url_for
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:fusionB%C3%87@localhost:3306/banco'
@@ -23,15 +24,24 @@ class Usuario(db.Model):
         self.senha = senha
         self.end = end
 
-
-
 @app.route("/")
 def index():
     return render_template('index.html')
 
-@app.route("/cad/usuario")
+@app.route("/cad/usuario", methods=['GET', 'POST'])
 def usuario():
-    return render_template('usuario.html',titulo="Cadastro de Usuario")
+    if request.method == 'POST':
+        usuario = Usuario(
+            request.form.get('user'),
+            request.form.get('email'),
+            request.form.get('senha'),
+            request.form.get('end')
+        )
+        db.session.add(usuario)
+        db.session.commit()
+        return redirect(url_for('index'))
+    
+    return render_template('usuario.html', titulo="Cadastro de Usuario")
 
 @app.route("/cad/anuncio")
 def anuncio():

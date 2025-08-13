@@ -73,7 +73,7 @@
 <body>
     <div class="container">
         <h2>{{titulo}}</h2>
-        <form action="caduser" method="post">
+        <form action="{{ url_for('usuario') }}" method="post">
             <label for="user">Username</label>
             <input type="text" id="user" name="user" required>
 
@@ -82,6 +82,9 @@
 
             <label for="passwd">Senha</label>
             <input type="password" id="passwd" name="passwd" required>
+
+            <label for="end">Endereço</label>
+            <input type="text" id="end" name="end" required>
 
             <input type="submit" value="Cadastrar">
         </form>
