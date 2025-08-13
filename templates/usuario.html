@@ -1,18 +1,90 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Compre&Venda - {{titulo}}</title>
-    </head>
-    <body>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Compre&Venda - {{titulo}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 320px;
+        }
+        h2 {
+            color: #ff6f00;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        label {
+            display: block;
+            text-align: left;
+            font-weight: bold;
+            color: #444;
+            margin-top: 10px;
+        }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ff8c00;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: #ff6f00;
+            box-shadow: 0 0 6px rgba(255,111,0,0.5);
+        }
+        input[type="submit"] {
+            background: linear-gradient(90deg, #ff8c00, #ff6f00);
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            font-size: 15px;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        }
+        input[type="submit"]:hover {
+            background: linear-gradient(90deg, #ff6f00, #e65100);
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
         <h2>{{titulo}}</h2>
         <form action="caduser" method="post">
-            <p><label for="user">Username</label></p>
-            <p><input type="text" id="user" name="user"></p>
-            <p><label for="email">E-mail</label></p>
-            <p><input type="text" id="email" name="email"></p>
-            <p><label for="passwd">Senha</label></p>
-            <p><input type="text" id="passwd" name="passwd"></p>
-            <p><input type="submit" value="Cadastrar"></p>
+            <label for="user">Username</label>
+            <input type="text" id="user" name="user" required>
+
+            <label for="email">E-mail</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="passwd">Senha</label>
+            <input type="password" id="passwd" name="passwd" required>
+
+            <input type="submit" value="Cadastrar">
         </form>
-    </body>
+    </div>
+</body>
 </html>
