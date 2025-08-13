@@ -34,7 +34,7 @@ def usuario():
         usuario = Usuario(
             request.form.get('user'),
             request.form.get('email'),
-            request.form.get('senha'),
+            request.form.get('passwd'),
             request.form.get('end')
         )
         db.session.add(usuario)
