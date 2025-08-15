@@ -11,12 +11,17 @@
             padding: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
+            align-items: flex-start;
+            min-height: 100vh;
         }
         .wrapper {
             display: flex;
-            gap: 60px; /* espaço maior entre formulário e tabela */
+            gap: 60px;
+            padding: 40px 0;
+            width: 70%;
+            max-width: 1200px;
+            margin: 0 auto;
+            justify-content: center;
         }
         .container {
             background: #fff;
@@ -24,7 +29,8 @@
             border-radius: 15px;
             box-shadow: 0 6px 15px rgba(0,0,0,0.1);
             text-align: center;
-            width: 320px;
+            flex: 1;
+            min-width: 350px;
         }
         h2 {
             color: #ff6f00;
@@ -58,12 +64,11 @@
             color: white;
             font-weight: bold;
             border: none;
-            padding: 12px;
+            padding: 15px 25px;
             border-radius: 8px;
             cursor: pointer;
-            width: 100%;
-            margin-top: 15px;
-            font-size: 15px;
+            margin-top: 10px;
+            font-size: 16px;
             transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
             box-shadow: 0 3px 6px rgba(0,0,0,0.15);
         }
@@ -72,55 +77,133 @@
             transform: scale(1.05);
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .table-wrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            width: 250px;
-        }
-
         h3 {
             color: #ff6f00;
             margin-bottom: 10px;
             text-align: center;
         }
-
         table {
             border-collapse: separate;
             border-spacing: 0;
             width: 100%;
             background: #fff;
-            
             box-shadow: 0 6px 15px rgba(0,0,0,0.1);
             table-layout: fixed;
         }
-
         th, td {
-            padding: 12px;
+            padding: 10px;
             text-align: left;
             border-bottom: 1px solid #f0f0f0;
-            word-wrap: break-word; /* quebra palavras longas */
+            word-wrap: break-word;
         }
-
         th {
             background-color: #ff8c00;
             color: white;
         }
-
         tr:last-child td {
             border-bottom: none;
         }
-
         tr:hover {
             background-color: #fff3e0;
         }
+        .action-form {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 0;
+        }
+        .action-form input[type="password"] {
+            padding: 8px;
+            border: 2px solid #ff8c00;
+            border-radius: 6px;
+            outline: none;
+            width: 150px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .action-form input[type="password"]:focus {
+            border-color: #ff6f00;
+            box-shadow: 0 0 6px rgba(255,111,0,0.5);
+        }
+        .action-form .btn-excluir {
+            background: linear-gradient(90deg, #ff4d4d, #ff1a1a);
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .action-form .btn-excluir:hover {
+            background: linear-gradient(90deg, #ff1a1a, #cc0000);
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+        }
+        a button {
+            background: #e0e0e0;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        a button:hover {
+            background: #d5d5d5;
+            transform: scale(1.05);
+        }
+        .home-btn {
+        position: fixed;
+        top: 15px;
+        right: 20px;
+        background: linear-gradient(90deg, #ff8c00, #ff6f00);
+        color: white;
+        font-weight: bold;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        transition: background 0.3s ease, transform 0.2s ease;
+        opacity: 0.8;
+    }
+
+    .home-btn:hover {
+        background: linear-gradient(90deg, #ff6f00, #e65100);
+        transform: scale(1.05);
+        opacity: 1;
+    }
     </style>
+    <script>
+        function confirmarExclusao(form) {
+            const senha = form.senha.value;
+            if (!senha) {
+                alert("Digite sua senha para excluir!");
+                return false;
+            }
+            // Aqui você pode adicionar validação de senha/usuário incorreto
+            const senhaCorreta = true; // Substitua com a lógica real
+            if (!senhaCorreta) {
+                alert("Usuário ou senha incorretos!");
+                return false;
+            }
+            return true;
+        }
+    </script>
 </head>
 <body>
     <div class="wrapper">
         <div class="container">
             <h2>{{titulo}}</h2>
-            <form action="{{ url_for('usuario') }}" method="post">
+
+            {% if mensagem %}
+            <script>alert("{{ mensagem }}");</script>
+            {% endif %}
+
+            <form action="{{ url_for('usuario_novo') }}" method="post">
                 <label for="user">Username</label>
                 <input type="text" id="user" name="user" required>
 
@@ -128,20 +211,21 @@
                 <input type="email" id="email" name="email" required>
 
                 <label for="senha">Senha</label>
-                <input type="password" id="senha" name="senha" required>
+                <input type="password" id="senha" name="passwd" required>
 
                 <label for="end">Endereço</label>
                 <input type="text" id="end" name="end" required>
 
                 <input type="submit" value="Cadastrar">
             </form>
-    
+
             <h3>Usuários Cadastrados</h3>
             <table>
                 <thead>
                     <tr>
                         <th>Usuário</th>
                         <th>Email</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -149,11 +233,21 @@
                     <tr>
                         <td>{{ usuario.nome }}</td>
                         <td>{{ usuario.email }}</td>
+                        <td>
+                            <form class="action-form" action="{{ url_for('delete_usuario', id=usuario.id) }}" method="POST">
+                                <a href="{{ url_for('edit_usuario', id=usuario.id) }}">
+                                    <button type="button">Editar</button>
+                                </a>
+                                <input type="password" name="senha" placeholder="Senha do usuário" required>
+                                <button type="submit" class="btn-excluir">Excluir</button>
+                            </form>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+    <a href="/" class="home-btn">Home</a>
 </body>
 </html>

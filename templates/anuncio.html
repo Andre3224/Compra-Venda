@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head> 
+    <title>BBB - Comprar e vender - Cadastro de {{titulo}}</title>
+    <style>
+        .home-btn {
+        position: fixed;
+        top: 15px;
+        right: 20px;
+        background: linear-gradient(90deg, #ff8c00, #ff6f00);
+        color: white;
+        font-weight: bold;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        transition: background 0.3s ease, transform 0.2s ease;
+        opacity: 0.8;
+    }
+
+    .home-btn:hover {
+        background: linear-gradient(90deg, #ff6f00, #e65100);
+        transform: scale(1.05);
+        opacity: 1;
+    }
+    </style>
+    <script>
+        function confirmarExclusao(form) {
+            const senha = form.senha.value;
+            if (!senha) {
+                alert("Digite a senha do usuário ou do admin!");
+                return false;
+            }
+
+            fetch(form.action, {
+                method: "POST",
+                body: new URLSearchParams(new FormData(form))
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    alert("Anúncio excluído com sucesso!");
+                    location.reload();
+                } else if (response.status === 403) {
+                    alert("Senha incorreta! Operação não autorizada.");
+                } else if (response.status === 404) {
+                    alert("Anúncio ou usuário não encontrado.");
+                } else {
+                    alert("Erro inesperado.");
+                }
+            })
+            .catch(err => alert("Erro na requisição: " + err));
+
+            return false; // evita envio tradicional
+        }
+    </script>
+</head>
+
+<body>
+    <h4>Cadastro de {{titulo}}</h4>
+    <form action="/anuncio/novo" method="post">
+        <p><label for="nome">Nome</label>
+        <input type="text" id="nome" name="nome" required></p>
+
+        <p><label for="desc">Desc</label>
+        <textarea rows="4" cols="50" id="desc" name="desc" required></textarea></p>       
+
+        <p><label for="qtd">Quantidade</label>
+        <input type="number" id="qtd" name="qtd" required></p>
+
+        <p><label for="preco">Preço</label>
+        <input type="number" step="0.01" id="preco" name="preco" required></p>
+        
+        <p><label for="cat">Categoria</label>
+        <select id="cat" name="cat" required>
+            {% for categoria in categorias %} 
+                <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+            {% endfor %}
+        </select></p>
+
+        <p><label for="usu">Usuário</label>
+        <select id="usu" name="usu" required>
+            {% for u in usuarios %}
+                <option value="{{ u.id }}">{{ u.nome }}</option>
+            {% endfor %}
+        </select></p>
+
+        <p><input type="submit" value="Cadastrar"></p>
+    </form>
+
+    <h4>Lista de {{titulo}}</h4>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Qtd</th>
+                <th>Preço</th>
+                <th>Categoria</th>
+                <th>Usuário</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in anuncios %}
+            <tr>
+                <td>{{ a.nome }}</td>
+                <td>{{ a.desc }}</td>
+                <td>{{ a.qtd }}</td>
+                <td>{{ a.preco }}</td>
+                <td>
+                    {% set categoria = categorias|selectattr("id","equalto",a.cat_id)|first %}
+                    {{ categoria.nome if categoria else "N/D" }}
+                </td>
+                <td>
+                    {% set usuario = usuarios | selectattr("id", "equalto", a.usu_id) | first %}
+                    {{ usuario.nome if usuario else "N/D" }}
+                </td>
+                <td>
+                    <form onsubmit="return confirmarExclusao(this);" action="{{ url_for('delete_anuncio', id=a.id) }}" method="POST" style="display:inline;">
+                        <input type="password" name="senha" placeholder="Digite sua senha ou do admin" required>
+                        <button type="submit">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="/" class="home-btn">Home</a>
+</body>
+</html>
