@@ -95,19 +95,7 @@ def delete_usuario(id):
 
 @app.route("/usuario/edit/<int:id>", methods=['GET', 'POST'])
 def edit_usuario(id):
-    usuario = Usuario.query.get(id)
-    if usuario is None:
-        return "Usuário não encontrado.", 404
-
-    if request.method == 'POST':
-        usuario.nome = request.form.get("user")
-        usuario.email = request.form.get("email")
-        usuario.senha = request.form.get("passwd")
-        usuario.end = request.form.get("end")
-        db.session.commit()
-        return redirect(url_for("usuario"))
-
-    return render_template("usuario_edit.html", usuario=usuario, titulo="Editar Usuario")
+    return 404
 
 @app.route("/anuncio/novo", methods=['GET', 'POST'])
 def anuncio():
