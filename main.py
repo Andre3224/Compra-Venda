@@ -7,7 +7,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# === MODELOS ===
+#MODELOS 
 class Usuario(db.Model):
     __tablename__ = "usuario"
     id = db.Column('usu_id', db.Integer, primary_key=True)
@@ -50,7 +50,7 @@ class Anuncio(db.Model):
         self.cat_id = cat_id
         self.usu_id = usu_id
 
-# === ROTAS ===
+#ROTAS
 @app.errorhandler(404)
 def paginanaoencontrada(error):
     return render_template('erro404.html')
@@ -79,7 +79,7 @@ def usuario():
 @app.route("/usuario/delete/<int:id>", methods=['POST'])
 def delete_usuario(id):
     usuario = Usuario.query.get(id)
-    if not usuario:
+    if usuario is None:
         mensagem = "Usuário não encontrado."
     else:
         senha_digitada = request.form.get("senha")
@@ -96,7 +96,7 @@ def delete_usuario(id):
 @app.route("/usuario/edit/<int:id>", methods=['GET', 'POST'])
 def edit_usuario(id):
     usuario = Usuario.query.get(id)
-    if not usuario:
+    if usuario is None:
         return "Usuário não encontrado.", 404
 
     if request.method == 'POST':
@@ -137,15 +137,15 @@ def delete_anuncio(id):
     senha_digitada = request.form.get("senha")  # senha do formulário
 
     anuncio = Anuncio.query.get(id)
-    if not anuncio:
+    if anuncio is None:
         return "Anúncio não encontrado.", 404
 
     usuario_criador = Usuario.query.get(anuncio.usu_id)
-    if not usuario_criador:
+    if usuario_criador is None:
         return "Usuário criador não encontrado.", 404
 
     admin_user = Usuario.query.filter_by(nome="admin").first()
-    if not admin_user:
+    if admin_user is None:
         return "Usuário admin não encontrado.", 404
 
     # Valida senha: admin ou dono do anúncio
