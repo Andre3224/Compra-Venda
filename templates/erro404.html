@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Erro 404 - Página Não Encontrada</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 320px;
+        }
+        h3 {
+            color: #ff6f00;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        p {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1em;
+        }
+        a {
+            display: block;
+            margin: 8px 0;
+            padding: 12px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            background: linear-gradient(90deg, #ff8c00, #ff6f00);
+            border-radius: 8px;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        }
+        a:hover {
+            background: linear-gradient(90deg, #ff6f00, #e65100);
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>Erro 404</h3>
+        <p>A página que você está procurando não foi encontrada.</p>
+        <a href="{{ url_for('index') }}">Voltar à Página Inicial</a>
+    </div>
+</body>
+</html>

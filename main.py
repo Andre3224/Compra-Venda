@@ -51,6 +51,10 @@ class Anuncio(db.Model):
         self.usu_id = usu_id
 
 # === ROTAS ===
+@app.errorhandler(404)
+def paginanaoencontrada(error):
+    return render_template('erro404.html')
+
 @app.route("/")
 def index():
     return render_template('index.html')
