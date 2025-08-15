@@ -168,7 +168,14 @@ def favoritos():
 
 @app.route("/config/categoria")
 def categoria():
-    return render_template('categoria.html')
+    return render_template('categoria.html', categorias = Categoria.query.all(), titulo='Categoria')
+
+@app.route("/categoria/novo", methods=['POST'])
+def novacategoria():
+    categoria = Categoria(request.form.get('nome'), request.form.get('desc'))
+    db.session.add(categoria)
+    db.session.commit()
+    return redirect(url_for('categoria'))
 
 @app.route("/relatorios/vendas")
 def relVendas():
