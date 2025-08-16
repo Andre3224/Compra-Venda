@@ -50,6 +50,18 @@ class Anuncio(db.Model):
         self.cat_id = cat_id
         self.usu_id = usu_id
 
+class Pergunta(db.Model):
+    __tablename__="pergunta"
+    id = db.Column('per_id', db.Integer, primary_key = True)
+    anuncio_id = db.Column('anu_id', db.Integer, db.ForeignKey("anuncio.anu_id"))
+    usuario_id = db.Column('usu_id', db.Integer, db.ForeignKey("usuario.usu_id"))
+    texto = db.Column('per_texto', db.Text)
+    resposta = db.Column('per_resposta', db.Text)
+
+    def __init__(self, anuncio_id, usuario_id, texto):
+        self.anuncio_id = anuncio_id
+        self.usuario_id = usuario_id
+        self.texto = texto
 #ROTAS
 @app.errorhandler(404)
 def paginanaoencontrada(error):
@@ -158,7 +170,89 @@ def delete_anuncio(id):
 
 @app.route("/anuncio/pergunta")
 def pergunta():
-    return render_template('pergunta.html')
+    perguntas = db.session.query(
+        Pergunta.id,
+        Pergunta.texto,
+        Pergunta.resposta,
+        Anuncio.nome.label("anuncio_nome"),
+        Usuario.nome.label("usuario_nome"),
+        Anuncio.usu_id.label("anuncio_dono_id")
+    ).join(Anuncio, Pergunta.anuncio_id == Anuncio.id)\
+     .join(Usuario, Pergunta.usuario_id == Usuario.id)\
+     .all()
+
+    return render_template("pergunta.html",
+        perguntas=perguntas,
+        anuncios=Anuncio.query.all(),
+        usuarios=Usuario.query.all(),        
+    )
+
+@app.route("/anuncio/pergunta/nova", methods=['POST'])
+def novapergunta():
+    anuncio_id = request.form.get("anuncio_id")
+    usuario_id = request.form.get("usuario_id")
+    senha = request.form.get("senha")
+    texto = request.form.get("texto")
+
+    usuario = Usuario.query.get(usuario_id)
+    if senha != usuario.senha:
+        return "Senha incorreta!", 403
+
+    pergunta = Pergunta(anuncio_id, usuario.id, texto)
+    db.session.add(pergunta)
+    db.session.commit()
+    return redirect(url_for("pergunta"))
+
+@app.route("/anuncio/pergunta/responder", methods=['GET', 'POST'])
+def responder():
+    usuarios = Usuario.query.all()
+    usuario_selecionado_id = request.args.get('usuario_id', type=int)
+    senha_digitada = request.args.get('senha', type=str)
+    anuncios = []
+    perguntas = []
+    mensagem = None
+
+    if request.method == 'POST':
+        pergunta_id = request.form.get('pergunta_id')
+        resposta = request.form.get('resposta')
+        if pergunta_id and resposta:
+            pergunta = Pergunta.query.get(int(pergunta_id))
+            if pergunta:
+                pergunta.resposta = resposta
+                db.session.commit()
+        usuario_selecionado_id = int(usuario_selecionado_id)
+
+    if usuario_selecionado_id and senha_digitada:
+        usuario = Usuario.query.get(usuario_selecionado_id)
+        if usuario:
+            if senha_digitada != usuario.senha:
+                mensagem = "Senha incorreta!"
+                anuncios = []
+                perguntas = []
+            else:
+                anuncios = Anuncio.query.filter_by(usu_id=usuario_selecionado_id).all()
+                if not anuncios:
+                    mensagem = "O usuário selecionado não possui anúncios cadastrados."
+                else:
+                    perguntas = db.session.query(
+                        Pergunta.id,
+                        Pergunta.texto,
+                        Pergunta.resposta,
+                        Pergunta.anuncio_id,
+                        Usuario.nome.label("usuario_nome")
+                    ).join(Usuario, Pergunta.usuario_id == Usuario.id)\
+                    .filter(Pergunta.anuncio_id.in_([a.id for a in anuncios]))\
+                    .all()
+
+    return render_template(
+        "pergunta_resposta.html",
+        usuarios=usuarios,
+        usuario_selecionado_id=usuario_selecionado_id,
+        anuncios=anuncios,
+        perguntas=perguntas,
+        mensagem=mensagem
+    )
+
 
 @app.route("/anuncio/compra")
 def compra():

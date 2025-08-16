@@ -1,0 +1,218 @@
+<!doctype html>
+<html>
+<head> 
+    <title>BBB - Comprar e vender - Perguntas</title>
+    <style>
+        .home-btn {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            background: linear-gradient(90deg, #ff8c00, #ff6f00);
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: background 0.3s ease, transform 0.2s ease;
+            opacity: 0.8;
+        }
+        .home-btn:hover {
+            background: linear-gradient(90deg, #ff6f00, #e65100);
+            transform: scale(1.05);
+            opacity: 1;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4; /* fundo sóbrio */
+            margin: 0;
+            padding: 20px;
+        }
+
+        h4 {
+            text-align: center;
+            color: #333;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            background: linear-gradient(90deg, #ff8c00, #ff6f00);
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: background 0.3s ease, transform 0.2s ease;
+            opacity: 0.8;
+        }
+
+        .home-btn:hover {
+            background: linear-gradient(90deg, #ff6f00, #e65100);
+            transform: scale(1.05);
+            opacity: 1;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #fff8f0; /* corpo mais claro */
+            color: #333;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        table th, table td {
+            padding: 12px 15px;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #ff9800; /* cabeçalho forte */
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #fff3e0; /* linhas alternadas mais claras */
+        }
+
+        a.responder-btn {
+            padding: 5px 10px;
+            background: #4caf50;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a.responder-btn:hover {
+            background: #388e3c;
+        }
+
+        form {
+            width: 50%;
+            margin: 0 auto 30px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        form p {
+            margin-bottom: 15px;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        form input[type="text"],
+        form input[type="password"],
+        form textarea,
+        form select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        form input[type="submit"] {
+            background: #ff8c00;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        form input[type="submit"]:hover {
+            background: #e65100;
+        }
+    </style>
+    <script>
+        function confirmarPergunta(form) {
+            const senha = form.senha.value;
+            if (!senha) {
+                alert("Digite a senha do usuário!");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <h4>Cadastro de Perguntas</h4>
+    <form action="/anuncio/pergunta/nova" method="post" onsubmit="return confirmarPergunta(this)">
+        <p><label for="anuncio_id">Selecione o Anúncio</label>
+        <select id="anuncio_id" name="anuncio_id" required>
+            {% for a in anuncios %}
+                <option value="{{ a.id }}">{{ a.nome }}</option>
+            {% endfor %}
+        </select></p>
+
+        <p><label for="usuario_id">Usuário</label>
+        <select id="usuario_id" name="usuario_id" required>
+            {% for u in usuarios %}
+                <option value="{{ u.id }}">{{ u.nome }}</option>
+            {% endfor %}
+        </select></p>
+
+        <p><label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required></p>
+
+        <p><label for="texto">Pergunta</label>
+        <textarea rows="4" cols="50" id="texto" name="texto" required></textarea></p>
+
+        <p><input type="submit" value="Enviar Pergunta"></p>
+    </form>
+
+    <h4>Lista de Perguntas</h4>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Anúncio</th>
+                <th>Usuário</th>
+                <th>Pergunta</th>
+                <th>Resposta</th>
+                <th>Responder</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in perguntas %}
+            <tr>
+                <td>{{ p.anuncio_nome }}</td>
+                <td>{{ p.usuario_nome }}</td>
+                <td>{{ p.texto }}</td>
+                <td>{{ p.resposta if p.resposta else "Aguardando resposta" }}</td>
+                <td>
+                {% if not p.resposta %}
+                <a href="{{ url_for('responder') }}?usuario_id={{ p.anuncio_dono_id }}" 
+                   style="padding:5px 10px; background:#4caf50; color:white; border-radius:5px; text-decoration:none;">
+                    Responder
+                </a>
+                {% else %}
+                Respondido
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="/" class="home-btn">Home</a>
+</body>
+</html>

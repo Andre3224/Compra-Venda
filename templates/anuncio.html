@@ -26,6 +26,125 @@
         transform: scale(1.05);
         opacity: 1;
     }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4; /* fundo sóbrio */
+            margin: 0;
+            padding: 20px;
+        }
+
+        h4 {
+            text-align: center;
+            color: #333;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            background: linear-gradient(90deg, #ff8c00, #ff6f00);
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: background 0.3s ease, transform 0.2s ease;
+            opacity: 0.8;
+        }
+
+        .home-btn:hover {
+            background: linear-gradient(90deg, #ff6f00, #e65100);
+            transform: scale(1.05);
+            opacity: 1;
+        }
+
+        table {
+            width: 100%; /* ocupa toda a largura da página */
+            border-collapse: collapse;
+            background-color: #fff8f0; /* fundo claro */
+            color: #333;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        table th {
+            background-color: #ff9800; /* cabeçalho laranja forte */
+            color: white;
+            padding: 12px 10px;
+        }
+
+        table td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #fff3e0; /* linhas alternadas mais claras */
+        }
+
+        a.responder-btn {
+            padding: 5px 10px;
+            background: #4caf50;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a.responder-btn:hover {
+            background: #388e3c;
+        }
+
+        form {
+            width: 50%;
+            margin: 0 auto 30px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        form p {
+            margin-bottom: 15px;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        form input[type="text"],
+        form input[type="password"],
+        form textarea,
+        form select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        form input[type="submit"] {
+            background: #ff8c00;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        form input[type="submit"]:hover {
+            background: #e65100;
+        }
+        
     </style>
     <script>
         function confirmarExclusao(form) {
@@ -119,10 +238,11 @@
                     {{ usuario.nome if usuario else "N/D" }}
                 </td>
                 <td>
-                    <form onsubmit="return confirmarExclusao(this);" action="{{ url_for('delete_anuncio', id=a.id) }}" method="POST" style="display:inline;">
-                        <input type="password" name="senha" placeholder="Digite sua senha ou do admin" required>
-                        <button type="submit">Excluir</button>
+                    <form onsubmit="return confirmarExclusao(this);" action="{{ url_for('delete_anuncio', id=a.id) }}" method="POST" style="display:flex; gap:5px; width:100%;">
+                        <input type="password" name="senha" placeholder="Digite sua senha ou do admin" required style="flex-grow:1; padding:6px; border:none; border-radius:5px; box-sizing:border-box;">
+                        <button type="submit" style="padding:6px 10px; border:none; border-radius:5px; background:#ff8c00; color:white; cursor:pointer;">Excluir</button>
                     </form>
+
                 </td>
             </tr>
             {% endfor %}
