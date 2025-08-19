@@ -1,5 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, make_response
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import (current_user, LoginManager,
+                             login_user, logout_user,
+                             login_required)
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://usuario_app:senhaSegura123@localhost:3306/banco'
