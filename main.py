@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import (current_user, LoginManager,
                              login_user, logout_user,
                              login_required)
+import hashlib
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://usuario_app:senhaSegura123@localhost:3306/banco'
@@ -118,12 +119,13 @@ def logout():
 
 @app.route("/usuario/novo", methods=['GET', 'POST'], endpoint="usuario_novo")
 def usuario():
+    hash = hashlib.sha512(str(request.form.get('passwd')).encode("utf-8")).hexdigest()
     mensagem = None
     if request.method == 'POST':
         usuario = Usuario(
             request.form.get('user'),
             request.form.get('email'),
-            request.form.get('passwd'),
+            hash,
             request.form.get('end')
         )
         db.session.add(usuario)
@@ -161,7 +163,7 @@ def edit_usuario(id):
     if request.method == 'POST':
         usuario.nome = request.form.get("user")
         usuario.email = request.form.get("email")
-        usuario.senha = request.form.get("passwd")
+        usuario.senha = hashlib.sha512(str(request.form.get('passwd')).encode("utf-8")).hexdigest()
         usuario.end = request.form.get("end")
         db.session.commit()
         return redirect(url_for("usuario_novo"))
