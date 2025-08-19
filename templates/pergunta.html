@@ -143,6 +143,20 @@
         form input[type="submit"]:hover {
             background: #e65100;
         }
+        .excluir-btn {
+            padding: 5px 10px;
+            background-color: #e53935; /* vermelho */
+            color: white;
+            border: none; /* sem contorno */
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .excluir-btn:hover {
+            background-color: #b71c1c; /* vermelho mais escuro ao passar o mouse */
+        }
     </style>
     <script>
         function confirmarPergunta(form) {
@@ -165,15 +179,8 @@
             {% endfor %}
         </select></p>
 
-        <p><label for="usuario_id">Usuário</label>
-        <select id="usuario_id" name="usuario_id" required>
-            {% for u in usuarios %}
-                <option value="{{ u.id }}">{{ u.nome }}</option>
-            {% endfor %}
-        </select></p>
-
-        <p><label for="senha">Senha</label>
-        <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required></p>
+        <input type="hidden" id="usuario_id" name="usuario_id" value="{{ usuario_logado.id }}">
+        <p>Usuário: <strong>{{ usuario_logado.nome }}</strong></p>
 
         <p><label for="texto">Pergunta</label>
         <textarea rows="4" cols="50" id="texto" name="texto" required></textarea></p>
@@ -183,35 +190,43 @@
 
     <h4>Lista de Perguntas</h4>
     <table border="1">
-        <thead>
-            <tr>
-                <th>Anúncio</th>
-                <th>Usuário</th>
-                <th>Pergunta</th>
-                <th>Resposta</th>
-                <th>Responder</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in perguntas %}
-            <tr>
-                <td>{{ p.anuncio_nome }}</td>
-                <td>{{ p.usuario_nome }}</td>
-                <td>{{ p.texto }}</td>
-                <td>{{ p.resposta if p.resposta else "Aguardando resposta" }}</td>
-                <td>
+    <thead>
+        <tr>
+            <th>Anúncio</th>
+            <th>Usuário</th>
+            <th>Pergunta</th>
+            <th>Resposta</th>
+            <th>Responder</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in perguntas %}
+        <tr>
+            <td>{{ p.anuncio_nome }}</td>
+            <td>{{ p.usuario_nome }}</td>
+            <td>{{ p.texto }}</td>
+            <td>{{ p.resposta if p.resposta else "Aguardando resposta" }}</td>
+            <td>
                 {% if not p.resposta %}
                 <a href="{{ url_for('responder') }}?usuario_id={{ p.anuncio_dono_id }}" 
-                   style="padding:5px 10px; background:#4caf50; color:white; border-radius:5px; text-decoration:none;">
-                    Responder
-                </a>
+                   class="responder-btn">Responder</a>
                 {% else %}
                 Respondido
                 {% endif %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </td>
+            <td>    
+                {% if p.usuario_id == usuario_logado.id %}
+                <form action="{{ url_for('excluir_pergunta') }}" method="post" style="display:inline;">
+                    <input type="hidden" name="pergunta_id" value="{{ p.id }}">
+                    <input type="submit" value="Excluir" class="excluir-btn">
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
     <a href="/" class="home-btn">Home</a>
 </body>

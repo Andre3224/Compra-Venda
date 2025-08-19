@@ -55,6 +55,7 @@ class Categoria(db.Model):
 class Anuncio(db.Model):
     __tablename__ = "anuncio"
     id = db.Column('anu_id', db.Integer, primary_key=True)
+    perguntas = db.relationship("Pergunta", backref="anuncio", cascade="all, delete-orphan")
     nome = db.Column('anu_nome', db.String(256))
     desc = db.Column('anu_desc', db.String(256))
     qtd = db.Column('anu_qtd', db.Integer)
@@ -101,7 +102,7 @@ def login():
         email = request.form.get('email')
         passwd = request.form.get('passwd')
 
-        user = Usuario.quary.filter_by(email=email, senha = passwd).first()
+        user = Usuario.query.filter_by(email=email, senha = passwd).first()
         if user:
             login_user(user)
             return redirect(url_for('index'))
@@ -177,7 +178,7 @@ def anuncio():
             request.form.get('qtd'),
             request.form.get('preco'),
             request.form.get('cat'),
-            request.form.get('usu')
+            current_user.id
         )
         db.session.add(anuncio)
         db.session.commit()
@@ -200,21 +201,18 @@ def delete_anuncio(id):
     if anuncio is None:
         return "Anúncio não encontrado.", 404
 
-    usuario_criador = Usuario.query.get(anuncio.usu_id)
-    if usuario_criador is None:
-        return "Usuário criador não encontrado.", 404
+    # Só criador ou admin podem excluir
+    if (anuncio.usu_id != current_user.id) and (current_user.nome != "admin"):
+        return "Você não tem permissão para excluir este anúncio.", 403
 
-    admin_user = Usuario.query.filter_by(nome="admin").first()
-    if admin_user is None:
-        return "Usuário admin não encontrado.", 404
+    # Confere senha do usuário logado
+    if senha_digitada != current_user.senha:
+        return "Senha incorreta! Operação não autorizada.", 403
 
-    # Valida senha: admin ou dono do anúncio
-    if senha_digitada == usuario_criador.senha or senha_digitada == admin_user.senha:
-        db.session.delete(anuncio)
-        db.session.commit()
-        return "Anúncio excluído com sucesso!", 200
+    db.session.delete(anuncio)
+    db.session.commit()
 
-    return "Senha incorreta! Operação não autorizada.", 403
+    return "Anúncio excluído com sucesso!", 200
 
 @app.route("/anuncio/pergunta")
 @login_required
@@ -230,25 +228,21 @@ def pergunta():
      .join(Usuario, Pergunta.usuario_id == Usuario.id)\
      .all()
 
-    return render_template("pergunta.html",
+    return render_template(
+        "pergunta.html",
         perguntas=perguntas,
         anuncios=Anuncio.query.all(),
-        usuarios=Usuario.query.all(),        
+        usuario_logado=current_user  # Passa apenas o usuário logado
     )
 
 @app.route("/anuncio/pergunta/nova", methods=['POST'])
 @login_required
 def novapergunta():
     anuncio_id = request.form.get("anuncio_id")
-    usuario_id = request.form.get("usuario_id")
-    senha = request.form.get("senha")
     texto = request.form.get("texto")
 
-    usuario = Usuario.query.get(usuario_id)
-    if senha != usuario.senha:
-        return "Senha incorreta!", 403
-
-    pergunta = Pergunta(anuncio_id, usuario.id, texto)
+    # Cria a pergunta usando o usuário logado
+    pergunta = Pergunta(anuncio_id, current_user.id, texto)
     db.session.add(pergunta)
     db.session.commit()
     return redirect(url_for("pergunta"))
@@ -256,10 +250,6 @@ def novapergunta():
 @app.route("/anuncio/pergunta/responder", methods=['GET', 'POST'])
 @login_required
 def responder():
-    usuarios = Usuario.query.all()
-    usuario_selecionado_id = request.args.get('usuario_id', type=int)
-    senha_digitada = request.args.get('senha', type=str)
-    anuncios = []
     perguntas = []
     mensagem = None
 
@@ -269,41 +259,54 @@ def responder():
         if pergunta_id and resposta:
             pergunta = Pergunta.query.get(int(pergunta_id))
             if pergunta:
-                pergunta.resposta = resposta
-                db.session.commit()
-        usuario_selecionado_id = int(usuario_selecionado_id)
-
-    if usuario_selecionado_id and senha_digitada:
-        usuario = Usuario.query.get(usuario_selecionado_id)
-        if usuario:
-            if senha_digitada != usuario.senha:
-                mensagem = "Senha incorreta!"
-                anuncios = []
-                perguntas = []
-            else:
-                anuncios = Anuncio.query.filter_by(usu_id=usuario_selecionado_id).all()
-                if not anuncios:
-                    mensagem = "O usuário selecionado não possui anúncios cadastrados."
+                anuncio = Anuncio.query.get(pergunta.anuncio_id)
+                # Só permite responder se current_user for dono do anúncio
+                if anuncio.usu_id != current_user.id:
+                    mensagem = "Você não pode responder perguntas de anúncios que não são seus."
                 else:
-                    perguntas = db.session.query(
-                        Pergunta.id,
-                        Pergunta.texto,
-                        Pergunta.resposta,
-                        Pergunta.anuncio_id,
-                        Usuario.nome.label("usuario_nome")
-                    ).join(Usuario, Pergunta.usuario_id == Usuario.id)\
-                    .filter(Pergunta.anuncio_id.in_([a.id for a in anuncios]))\
-                    .all()
+                    pergunta.resposta = resposta
+                    db.session.commit()
+                    mensagem = "Resposta enviada com sucesso!"
+
+    # Pega todos os anúncios do usuário logado
+    anuncios = Anuncio.query.filter_by(usu_id=current_user.id).all()
+    if anuncios:
+        perguntas = db.session.query(
+            Pergunta.id,
+            Pergunta.texto,
+            Pergunta.resposta,
+            Pergunta.anuncio_id,
+            Usuario.nome.label("usuario_nome")
+        ).join(Usuario, Pergunta.usuario_id == Usuario.id)\
+         .filter(Pergunta.anuncio_id.in_([a.id for a in anuncios]))\
+         .all()
+    else:
+        mensagem = "Você não possui anúncios para responder perguntas."
 
     return render_template(
         "pergunta_resposta.html",
-        usuarios=usuarios,
-        usuario_selecionado_id=usuario_selecionado_id,
-        anuncios=anuncios,
         perguntas=perguntas,
-        mensagem=mensagem
+        anuncios=anuncios,
+        mensagem=mensagem,
+        usuario_logado=current_user
     )
 
+@app.route("/anuncio/pergunta/excluir", methods=['POST'])
+@login_required
+def excluir_pergunta():
+    pergunta_id = request.form.get('pergunta_id')
+    pergunta = Pergunta.query.get(pergunta_id)
+    if not pergunta:
+        return redirect(url_for('pergunta'))
+
+    # Só o dono do anúncio pode excluir
+    anuncio = Anuncio.query.get(pergunta.anuncio_id)
+    if anuncio.usu_id != current_user.id:
+        return redirect(url_for('pergunta'))
+
+    db.session.delete(pergunta)
+    db.session.commit()
+    return redirect(url_for('pergunta'))
 
 @app.route("/anuncio/compra")
 @login_required

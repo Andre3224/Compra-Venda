@@ -199,11 +199,7 @@
             {% endfor %}
         </select></p>
 
-        <p><label for="usu">Usuário</label>
-        <select id="usu" name="usu" required>
-            {% for u in usuarios %}
-                <option value="{{ u.id }}">{{ u.nome }}</option>
-            {% endfor %}
+       <p><label>Usuário logado:</label> <b>{{ current_user.nome }}</b></p>
         </select></p>
 
         <p><input type="submit" value="Cadastrar"></p>
@@ -238,9 +234,11 @@
                     {{ usuario.nome if usuario else "N/D" }}
                 </td>
                 <td>
-                    <form onsubmit="return confirmarExclusao(this);" action="{{ url_for('delete_anuncio', id=a.id) }}" method="POST" style="display:flex; gap:5px; width:100%;">
-                        <input type="password" name="senha" placeholder="Digite sua senha ou do admin" required style="flex-grow:1; padding:6px; border:none; border-radius:5px; box-sizing:border-box;">
-                        <button type="submit" style="padding:6px 10px; border:none; border-radius:5px; background:#ff8c00; color:white; cursor:pointer;">Excluir</button>
+                    <form onsubmit="return confirmarExclusao(this);" 
+                        action="{{ url_for('delete_anuncio', id=a.id) }}" 
+                        method="POST" style="display:flex; gap:5px; width:100%;">
+                        <input type="password" name="senha" placeholder="Digite sua senha para confirmar" required>
+                        <button type="submit">Excluir</button>
                     </form>
 
                 </td>

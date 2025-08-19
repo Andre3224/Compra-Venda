@@ -30,30 +30,16 @@
         }
     </style>
 </head>
-<body>
-    <h4>Responder Perguntas</h4>
+ <h4>Responder Perguntas</h4>
 
-    <form method="get">
-    <label for="usuario_id">Selecione o usuário:</label>
-    <select id="usuario_id" name="usuario_id" required>
-        <option value="">--Escolha o usuário--</option>
-        {% for u in usuarios %}
-            <option value="{{ u.id }}" {% if u.id == usuario_selecionado_id %}selected{% endif %}>{{ u.nome }}</option>
-        {% endfor %}
-    </select>
-    <br><br>
-    <label for="senha">Senha:</label>
-    <input type="password" id="senha" name="senha" required>
-    <br><br>
-    <button type="submit">Selecionar usuário</button>
-    </form>
+    <p>Usuário logado: <strong>{{ usuario_logado.nome }}</strong></p>
 
     {% if mensagem %}
         <p style="color:red; font-weight:bold;">{{ mensagem }}</p>
     {% endif %}
 
     {% if anuncios %}
-        <h4>Anúncios do usuário</h4>
+        <h4>Seus Anúncios</h4>
         {% for a in anuncios %}
             <h5>{{ a.nome }}</h5>
             <table border="1">
@@ -75,9 +61,10 @@
                                 <form method="POST">
                                     <textarea name="resposta" placeholder="Digite sua resposta" required></textarea>
                                     <input type="hidden" name="pergunta_id" value="{{ p.id }}">
-                                    <input type="hidden" name="usuario_id" value="{{ usuario_selecionado_id }}">
                                     <button type="submit">Responder</button>
                                 </form>
+                                {% else %}
+                                Respondido
                                 {% endif %}
                             </td>
                         </tr>
@@ -86,6 +73,8 @@
                 </tbody>
             </table>
         {% endfor %}
+    {% else %}
+        <p>Você não possui anúncios para responder perguntas.</p>
     {% endif %}
 
     <a href="/" class="home-btn">Home</a>
