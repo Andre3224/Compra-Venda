@@ -10,6 +10,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+app.secret_key = 'arroz eh massa'
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
 #MODELOS 
 class Usuario(db.Model):
     __tablename__ = "usuario"
@@ -24,6 +29,18 @@ class Usuario(db.Model):
         self.email = email
         self.senha = senha
         self.end = end
+
+     def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return str(self.id)
 
 class Categoria(db.Model):
     __tablename__ = "categoria"
