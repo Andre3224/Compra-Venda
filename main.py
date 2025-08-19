@@ -101,9 +101,9 @@ def index():
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
-        passwd = request.form.get('passwd')
+        passwd = hashlib.sha512(str(request.form.get('passwd')).encode("utf-8")).hexdigest()
 
-        user = Usuario.query.filter_by(email=email, senha = passwd).first()
+        user = Usuario.query.filter_by(email=email, senha=passwd).first()
         if user:
             login_user(user)
             return redirect(url_for('index'))
@@ -119,9 +119,9 @@ def logout():
 
 @app.route("/usuario/novo", methods=['GET', 'POST'], endpoint="usuario_novo")
 def usuario():
-    hash = hashlib.sha512(str(request.form.get('passwd')).encode("utf-8")).hexdigest()
     mensagem = None
     if request.method == 'POST':
+        hash = hashlib.sha512(request.form.get('passwd').encode('utf-8')).hexdigest()
         usuario = Usuario(
             request.form.get('user'),
             request.form.get('email'),
@@ -143,7 +143,8 @@ def delete_usuario(id):
         mensagem = "Usuário não encontrado."
     else:
         senha_digitada = request.form.get("senha")
-        if senha_digitada == usuario.senha:
+        senha_hash = hashlib.sha512(senha_digitada.encode('utf-8')).hexdigest()
+        if senha_hash == usuario.senha:
             db.session.delete(usuario)
             db.session.commit()
             mensagem = "Usuário excluído com sucesso!"
@@ -163,7 +164,7 @@ def edit_usuario(id):
     if request.method == 'POST':
         usuario.nome = request.form.get("user")
         usuario.email = request.form.get("email")
-        usuario.senha = hashlib.sha512(str(request.form.get('passwd')).encode("utf-8")).hexdigest()
+        usuario.senha = hashlib.sha512(request.form.get("passwd").encode('utf-8')).hexdigest()
         usuario.end = request.form.get("end")
         db.session.commit()
         return redirect(url_for("usuario_novo"))
@@ -207,8 +208,8 @@ def delete_anuncio(id):
     if (anuncio.usu_id != current_user.id) and (current_user.nome != "admin"):
         return "Você não tem permissão para excluir este anúncio.", 403
 
-    # Confere senha do usuário logado
-    if senha_digitada != current_user.senha:
+    senha_hash = hashlib.sha512(senha_digitada.encode('utf-8')).hexdigest()
+    if senha_hash != current_user.senha:
         return "Senha incorreta! Operação não autorizada.", 403
 
     db.session.delete(anuncio)
