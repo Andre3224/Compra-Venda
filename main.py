@@ -30,7 +30,7 @@ class Usuario(db.Model):
         self.senha = senha
         self.end = end
 
-     def is_authenticated(self):
+    def is_authenticated(self):
         return True
 
     def is_active(self):
@@ -87,9 +87,33 @@ class Pergunta(db.Model):
 def paginanaoencontrada(error):
     return render_template('erro404.html')
 
+@login_manager.user_loader
+def load_user(id):
+    return Usuario.query.get(id)
+
 @app.route("/")
 def index():
     return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        passwd = request.form.get('passwd')
+
+        user = Usuario.quary.filter_by(email=email, senha = passwd).first()
+        if user:
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            return redirect(url_for('login'))
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.route("/usuario/novo", methods=['GET', 'POST'], endpoint="usuario_novo")
 def usuario():
