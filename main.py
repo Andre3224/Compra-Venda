@@ -133,6 +133,7 @@ def usuario():
     return render_template('usuario.html', usuarios=usuarios, titulo="Cadastro de Usuario", mensagem=mensagem)
 
 @app.route("/usuario/delete/<int:id>", methods=['POST'])
+@login_required
 def delete_usuario(id):
     usuario = Usuario.query.get(id)
     if usuario is None:
@@ -150,6 +151,7 @@ def delete_usuario(id):
 
 
 @app.route("/usuario/edit/<int:id>", methods=['GET', 'POST'])
+@login_required
 def edit_usuario(id):
     usuario = Usuario.query.get(id)
     if usuario is None:
@@ -166,6 +168,7 @@ def edit_usuario(id):
     return render_template("usuario_edit.html", usuario=usuario, titulo="Editar Usuario")
 
 @app.route("/anuncio/novo", methods=['GET', 'POST'])
+@login_required
 def anuncio():
     if request.method == 'POST':
         anuncio = Anuncio(
@@ -189,6 +192,7 @@ def anuncio():
     )
 
 @app.route("/anuncio/delete/<int:id>", methods=['POST'])
+@login_required
 def delete_anuncio(id):
     senha_digitada = request.form.get("senha")  # senha do formulário
 
@@ -213,6 +217,7 @@ def delete_anuncio(id):
     return "Senha incorreta! Operação não autorizada.", 403
 
 @app.route("/anuncio/pergunta")
+@login_required
 def pergunta():
     perguntas = db.session.query(
         Pergunta.id,
@@ -232,6 +237,7 @@ def pergunta():
     )
 
 @app.route("/anuncio/pergunta/nova", methods=['POST'])
+@login_required
 def novapergunta():
     anuncio_id = request.form.get("anuncio_id")
     usuario_id = request.form.get("usuario_id")
@@ -248,6 +254,7 @@ def novapergunta():
     return redirect(url_for("pergunta"))
 
 @app.route("/anuncio/pergunta/responder", methods=['GET', 'POST'])
+@login_required
 def responder():
     usuarios = Usuario.query.all()
     usuario_selecionado_id = request.args.get('usuario_id', type=int)
@@ -299,20 +306,24 @@ def responder():
 
 
 @app.route("/anuncio/compra")
+@login_required
 def compra():
     print("Anuncio Comprado")
     return ""
 
 @app.route("/anuncio/favoritos")
+@login_required
 def favoritos():
     print("Favorito Inserido")
     return ""
 
 @app.route("/config/categoria")
+@login_required
 def categoria():
     return render_template('categoria.html', categorias = Categoria.query.all(), titulo='Categoria')
 
 @app.route("/categoria/novo", methods=['POST'])
+@login_required
 def novacategoria():
     categoria = Categoria(request.form.get('nome'), request.form.get('desc'))
     db.session.add(categoria)
@@ -320,10 +331,12 @@ def novacategoria():
     return redirect(url_for('categoria'))
 
 @app.route("/relatorios/vendas")
+@login_required
 def relVendas():
     return render_template('relVendas.html')
 
 @app.route("/relatorios/compras")
+@login_required
 def relCompras():
     return render_template('relVCompras.html')
 
