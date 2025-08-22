@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, make_response
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 from flask_login import (current_user, LoginManager,
                              login_user, logout_user,
                              login_required)
@@ -85,6 +86,17 @@ class Pergunta(db.Model):
         self.anuncio_id = anuncio_id
         self.usuario_id = usuario_id
         self.texto = texto
+
+class Compra(db.Model):
+    __tablename__ = "compra"
+    id = db.Column(db.Integer, primary_key=True)
+    anuncio_id = db.Column(db.Integer, db.ForeignKey("anuncio.anu_id"))
+    usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.usu_id"))
+
+    def __init__(self, anuncio_id, usuario_id):
+        self.anuncio_id = anuncio_id
+        self.usuario_id = usuario_id
+
 #ROTAS
 @app.errorhandler(404)
 def paginanaoencontrada(error):
@@ -318,11 +330,23 @@ def excluir_pergunta():
     db.session.commit()
     return redirect(url_for('pergunta'))
 
-@app.route("/anuncio/compra")
+@app.route("/anuncio/compra/<int:id>", methods=['POST'])
 @login_required
-def compra():
-    print("Anuncio Comprado")
-    return ""
+def comprar_anuncio(id):
+    anuncio = Anuncio.query.get(id)
+    if not anuncio:
+        return "Anúncio não encontrado", 404
+
+    if anuncio.qtd <= 0:
+        return "Produto esgotado", 400
+
+    compra = Compra(anuncio_id=id, usuario_id=current_user.id)
+    db.session.add(compra)
+    
+    anuncio.qtd -= 1
+    db.session.commit()
+
+    return redirect(url_for("anuncio"))
 
 @app.route("/anuncio/favoritos")
 @login_required
@@ -345,13 +369,20 @@ def novacategoria():
 
 @app.route("/relatorios/vendas")
 @login_required
-def relVendas():
-    return render_template('relVendas.html')
+def rel_vendas():
+    compras = db.session.query(
+        Anuncio.id.label("produto_id"),
+        Anuncio.nome.label("produto_nome"),
+        Anuncio.preco.label("valor_unitario"),
+        Anuncio.usu_id.label("vendedor_id"),
+        func.count(Compra.id).label("quantidade_total"),
+        func.sum(Anuncio.preco).label("valor_total")
+    ).join(Compra, Compra.anuncio_id == Anuncio.id)\
+     .group_by(Anuncio.id).all()
 
-@app.route("/relatorios/compras")
-@login_required
-def relCompras():
-    return render_template('relVCompras.html')
+    usuarios = {u.id: u.nome for u in Usuario.query.all()}
+
+    return render_template("relVendas.html", compras=compras, usuarios=usuarios)
 
 # INICIALIZAÇÃO
 if __name__ == '__main__':

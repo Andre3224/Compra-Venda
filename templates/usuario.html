@@ -253,6 +253,12 @@
             </table>
         </div>
     </div>
-    <a href="/" class="home-btn">Home</a>
+    {% if current_user.is_authenticated %}
+        <a href="/" class="home-btn" style="right: 20px;">Home</a>
+        <a href="{{ url_for('logout') }}" class="home-btn" style="right: 120px;">Sair</a>
+    {% else %}
+        <a href="/" class="home-btn" style="right: 20px;">Home</a>
+        <a href="{{ url_for('login') }}" class="home-btn" style="right: 120px;">Login</a>
+    {% endif %}
 </body>
 </html>

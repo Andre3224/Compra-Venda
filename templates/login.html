@@ -1,4 +1,4 @@
-<!doctype html>
+<!-- <!doctype html>
 <html>
 <head> 
     <title>Compre&Venda - Login</title>
@@ -6,7 +6,7 @@
 
 <body>
     <h4>Login</h4>
-    <form action="/login" method="post">
+   n <form actio="/login" method="post">
         <p><label for="email">Email</label>
         <input type="text" id="email" name="email"></p>
 
@@ -15,4 +15,36 @@
 
         <p><input type="submit" value="Logar"></p>
     </form>
+</html> -->
+
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Compre&Venda - Login</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light d-flex align-items-center justify-content-center vh-100">
+  <div class="card shadow p-4 rounded-4" style="width: 22rem;">
+    <h4 class="text-center mb-4">Login - Compre&Venda</h4>
+    <form action="/login" method="post">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="text" class="form-control" id="email" name="email" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="passwd" class="form-label">Senha</label>
+        <input type="password" class="form-control" id="passwd" name="passwd" required>
+      </div>
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary">Logar</button>
+      </div>
+    </form>
+  </div>
+</body>
 </html>

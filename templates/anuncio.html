@@ -172,7 +172,8 @@
             })
             .catch(err => alert("Erro na requisição: " + err));
 
-            return false; // evita envio tradicional
+            return false;
+            
         }
     </script>
 </head>
@@ -216,10 +217,11 @@
                 <th>Categoria</th>
                 <th>Usuário</th>
                 <th>Ações</th>
+                <th>Compra</th>
             </tr>
         </thead>
         <tbody>
-            {% for a in anuncios %}
+            {% for a in anuncios if a.qtd > 0 %}
             <tr>
                 <td>{{ a.nome }}</td>
                 <td>{{ a.desc }}</td>
@@ -240,7 +242,15 @@
                         <input type="password" name="senha" placeholder="Digite sua senha para confirmar" required>
                         <button type="submit">Excluir</button>
                     </form>
-
+                </td>
+                <td>
+                    <form action="{{ url_for('comprar_anuncio', id=a.id) }}" method="POST" 
+                        onsubmit="return comprarProduto(this, event);" style="margin-top:5px;">
+                        <button type="submit" class="btn-comprar" 
+                                style="background: #4caf50; color: white; padding:5px 10px; border:none; border-radius:5px;">
+                            Comprar
+                        </button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}

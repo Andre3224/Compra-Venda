@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Vendas</title>
+    <style>
+        .home-btn {
+            position: fixed; /* fixa na tela */
+            top: 10px;       /* distância do topo */
+            left: 10px;      /* distância da esquerda */
+            background: #ff8c00;
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .home-btn:hover {
+            background: #e65100;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h2 {
+            text-align: center;
+            color: #ff6f00;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fff3e0;
+        }
+
+        tr:hover {
+            background-color: #ffe0b2;
+        }
+
+        .home-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #ff8c00, #ff6f00);
+            color: white;
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .home-btn:hover {
+            background: linear-gradient(90deg, #ff6f00, #e65100);
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center;">Relatório de Vendas</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Vendedor</th>
+                <th>Qtd Vendida</th>
+                <th>Valor Unitário</th>
+                <th>Valor Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in compras %}
+            <tr>
+                <td>{{ c.produto_nome }}</td>
+                <td>{{ usuarios[c.vendedor_id] }}</td>
+                <td>{{ c.quantidade_total }}</td>
+                <td>R$ {{ "%.2f"|format(c.valor_unitario) }}</td>
+                <td>R$ {{ "%.2f"|format(c.valor_total) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="/" class="home-btn">Home</a>
+</body>
+</html>
+</html>
