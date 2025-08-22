@@ -184,8 +184,7 @@
                 alert("Digite sua senha para excluir!");
                 return false;
             }
-            // Aqui você pode adicionar validação de senha/usuário incorreto
-            const senhaCorreta = true; // Substitua com a lógica real
+            const senhaCorreta = true;
             if (!senhaCorreta) {
                 alert("Usuário ou senha incorretos!");
                 return false;
@@ -218,32 +217,38 @@
 
                 <input type="submit" value="Cadastrar">
             </form>
+            {% if current_user.is_authenticated %}
+                <h3>Seu Perfil</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Usuário</th>
+                                <th>Email</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ current_user.nome }}</td>
+                                <td>{{ current_user.email }}</td>
+                                <td>
+                                    <form class="action-form" action="{{ url_for('delete_usuario', id=current_user.id) }}" method="POST">
+                                        <a href="{{ url_for('edit_usuario', id=current_user.id) }}">
+                                            <button type="button">Editar</button>
+                                        </a>
+                                        <input type="password" name="senha" placeholder="Senha do usuário" required>
+                                        <button type="submit" class="btn-excluir">Excluir</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p style="text-align:center; margin-top:15px; color:#666;">
+                        Nenhum usuário logado. Faça o Cadastro acima
+                    </p>
+                {% endif %}
 
-            <h3>Usuários Cadastrados</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Usuário</th>
-                        <th>Email</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for usuario in usuarios %}
-                    <tr>
-                        <td>{{ usuario.nome }}</td>
-                        <td>{{ usuario.email }}</td>
-                        <td>
-                            <form class="action-form" action="{{ url_for('delete_usuario', id=usuario.id) }}" method="POST">
-                                <a href="{{ url_for('edit_usuario', id=usuario.id) }}">
-                                    <button type="button">Editar</button>
-                                </a>
-                                <input type="password" name="senha" placeholder="Senha do usuário" required>
-                                <button type="submit" class="btn-excluir">Excluir</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
                 </tbody>
             </table>
         </div>

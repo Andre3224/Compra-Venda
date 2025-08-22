@@ -7,6 +7,7 @@ import hashlib
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://usuario_app:senhaSegura123@localhost:3306/banco'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://andresantosPP.mysql.pythonanywhere-services.com/andresantosPP$banco'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -132,8 +133,14 @@ def usuario():
         db.session.commit()
         mensagem = "Usuário cadastrado com sucesso!"
     
-    usuarios = Usuario.query.all()
-    return render_template('usuario.html', usuarios=usuarios, titulo="Cadastro de Usuario", mensagem=mensagem)
+    if current_user.is_authenticated:
+        usuarios = [current_user]
+        titulo = "Perfil do Usuário"
+    else:
+        usuarios = []  # se não estiver logado, não mostra nada
+        titulo = "Cadastro de Usuario"
+
+    return render_template('usuario.html', usuarios=usuarios, titulo=titulo, mensagem=mensagem)
 
 @app.route("/usuario/delete/<int:id>", methods=['POST'])
 @login_required
